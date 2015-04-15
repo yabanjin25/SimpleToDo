@@ -4,7 +4,7 @@ This is Project 0 for the CodePath Android Bootcamp.
 
 This is a simple todo application that allows a user to create a list of items which they wish to do. Items can be edited, added and removed from the list.
 
-Time spent: 2 hours spent in total (creating the application; Android Studio setup time not included)
+Time spent: 3 hours spent in total (creating the application; Android Studio setup time not included)
 
 Completed user stories:
 
@@ -19,6 +19,6 @@ Initially had some trouble with passing the data around, but that was really the
 
 Walkthrough of all user stories:
 
-![Video Walkthrough]()
+![Video Walkthrough](SimpleToDoWalkthrough.gif)
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
