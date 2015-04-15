@@ -24,6 +24,7 @@ public class EditItemActivity extends ActionBarActivity {
         EditText editItemEditText = (EditText) findViewById(R.id.editItemTextView);
         editItemEditText.setText(itemText);
         editItemEditText.setSelection(itemText.length());
+        editItemEditText.requestFocus();
     }
 
 
