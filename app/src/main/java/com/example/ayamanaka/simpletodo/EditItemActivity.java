@@ -11,6 +11,7 @@ import android.widget.EditText;
 
 public class EditItemActivity extends ActionBarActivity {
 
+    TodoItem itemToEdit;
     int itemPosition;
 
     @Override
@@ -18,10 +19,11 @@ public class EditItemActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_item);
 
-        String itemText = getIntent().getStringExtra("itemText");
+        itemToEdit = (TodoItem) getIntent().getSerializableExtra("item");
         itemPosition = getIntent().getIntExtra("itemPosition", 0);
 
         EditText editItemEditText = (EditText) findViewById(R.id.editItemTextView);
+        String itemText = itemToEdit.getBody();
         editItemEditText.setText(itemText);
         editItemEditText.setSelection(itemText.length());
         editItemEditText.requestFocus();
@@ -56,7 +58,8 @@ public class EditItemActivity extends ActionBarActivity {
         // Prepare data intent
         Intent data = new Intent();
         // Pass relevant data back as a result
-        data.putExtra("editedText", editItemText);
+        itemToEdit.setBody(editItemText);
+        data.putExtra("editedItem", itemToEdit);
         data.putExtra("itemPosition", itemPosition);
         // Activity finished ok, return the data
         setResult(RESULT_OK, data); // set result code and bundle data for response

@@ -11,17 +11,15 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 
-import org.apache.commons.io.FileUtils;
-
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainActivity extends ActionBarActivity {
 
-    ArrayList<String> items;
-    ArrayAdapter<String> itemsAdapter;
+    TodoItemDatabase db;
+    ArrayList<TodoItem> items;
+    ArrayAdapter<TodoItem> itemsAdapter;
     ListView lvItems;
     private final int REQUEST_CODE = 20;
 
@@ -29,14 +27,13 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        db = new TodoItemDatabase(this);
         lvItems = (ListView) findViewById(R.id.lvItems);
         readItems();
-        itemsAdapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1, items);
+        itemsAdapter = new TodoItemArrayAdapter(this, items);
         lvItems.setAdapter(itemsAdapter);
         setupListViewListener();
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -63,9 +60,10 @@ public class MainActivity extends ActionBarActivity {
     public void onAddItem(View v) {
         EditText etNewItem = (EditText) findViewById(R.id.etNewItem);
         String itemText = etNewItem.getText().toString();
-        itemsAdapter.add(itemText);
+        TodoItem itemToAdd = new TodoItem(itemText, 1);
+        long id = db.addTodoItem(itemToAdd);
+        itemsAdapter.add(db.getTodoItem((int)id));
         etNewItem.setText("");
-        writeItems();
     }
 
     private void setupListViewListener() {
@@ -73,9 +71,10 @@ public class MainActivity extends ActionBarActivity {
                 new AdapterView.OnItemLongClickListener() {
                     @Override
                     public boolean onItemLongClick(AdapterView<?> adapter, View item, int pos, long id) {
+                        TodoItem itemToRemove = items.get(pos);
+                        db.deleteTodoItem(itemToRemove);
                         items.remove(pos);
                         itemsAdapter.notifyDataSetChanged();
-                        writeItems();
                         return true;
                     }
                 }
@@ -86,8 +85,8 @@ public class MainActivity extends ActionBarActivity {
                     @Override
                     public void onItemClick(AdapterView<?> adapter, View item, int pos, long id) {
                         Intent i = new Intent(MainActivity.this, EditItemActivity.class);
-                        String itemText = items.get(pos);
-                        i.putExtra("itemText", itemText);
+                        TodoItem todoItem = items.get(pos);
+                        i.putExtra("item", todoItem);
                         i.putExtra("itemPosition", pos);
                         startActivityForResult(i, REQUEST_CODE);
                     }
@@ -96,23 +95,8 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void readItems() {
-        File filesDir = getFilesDir();
-        File todoFile = new File(filesDir, "todo.txt");
-        try {
-            items = new ArrayList<String>(FileUtils.readLines(todoFile));
-        } catch (IOException e) {
-            items = new ArrayList<String>();
-        }
-    }
-
-    private void writeItems() {
-        File filesDir = getFilesDir();
-        File todoFile = new File(filesDir, "todo.txt");
-        try {
-            FileUtils.writeLines(todoFile, items);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        List<TodoItem> todoItems = db.getAllTodoItems();
+        items = new ArrayList<TodoItem>(todoItems);
     }
 
     @Override
@@ -120,12 +104,12 @@ public class MainActivity extends ActionBarActivity {
         // REQUEST_CODE is defined above
         //if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
         // Extract name value from result extras
-        String editedText = data.getExtras().getString("editedText");
+        TodoItem editedItem = (TodoItem) data.getExtras().getSerializable("editedItem");
         int itemPosition = data.getExtras().getInt("itemPosition");
         //int code = data.getExtras().getInt("code", 0);
-        items.set(itemPosition, editedText);
+        db.updateTodoItem(editedItem);
+        items.set(itemPosition, editedItem);
         itemsAdapter.notifyDataSetChanged();
-        writeItems();
         //}
     }
 }
