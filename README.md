@@ -22,3 +22,7 @@ Walkthrough of all user stories:
 ![Video Walkthrough](SimpleToDoWalkthrough.gif)
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
+
+Extensions:
+
+ * Replaced persistence of items through a file with a SQLite database
