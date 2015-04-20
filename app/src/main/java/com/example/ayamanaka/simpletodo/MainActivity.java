@@ -7,7 +7,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 
@@ -19,7 +18,7 @@ public class MainActivity extends ActionBarActivity {
 
     TodoItemDatabase db;
     ArrayList<TodoItem> items;
-    ArrayAdapter<TodoItem> itemsAdapter;
+    TodoItemArrayAdapter itemsAdapter;
     ListView lvItems;
     private final int REQUEST_CODE = 20;
 
@@ -30,8 +29,14 @@ public class MainActivity extends ActionBarActivity {
         db = new TodoItemDatabase(this);
         lvItems = (ListView) findViewById(R.id.lvItems);
         readItems();
-        itemsAdapter = new TodoItemArrayAdapter(this, items);
+        itemsAdapter = new TodoItemArrayAdapter(this, this, items);
         lvItems.setAdapter(itemsAdapter);
+        itemsAdapter.setOnDataChangeListener(new TodoItemArrayAdapter.OnDataChangeListener() {
+            public void onDataChanged(int position) {
+                updateTodoItem(position);
+            }
+        });
+
         setupListViewListener();
     }
 
@@ -60,7 +65,7 @@ public class MainActivity extends ActionBarActivity {
     public void onAddItem(View v) {
         EditText etNewItem = (EditText) findViewById(R.id.etNewItem);
         String itemText = etNewItem.getText().toString();
-        TodoItem itemToAdd = new TodoItem(itemText, 1);
+        TodoItem itemToAdd = new TodoItem(itemText, 1, false);
         long id = db.addTodoItem(itemToAdd);
         itemsAdapter.add(db.getTodoItem((int)id));
         etNewItem.setText("");
@@ -111,5 +116,16 @@ public class MainActivity extends ActionBarActivity {
         items.set(itemPosition, editedItem);
         itemsAdapter.notifyDataSetChanged();
         //}
+    }
+
+    protected void updateTodoItem(int position)
+    {
+        TodoItem itemToChange = items.get(position);
+        boolean newGetDone = !itemToChange.getDone();
+        itemToChange.setDone(newGetDone);
+
+        db.updateTodoItem(itemToChange);
+        items.set(position, itemToChange);
+        itemsAdapter.notifyDataSetChanged();
     }
 }

@@ -10,11 +10,13 @@ public class TodoItem implements Serializable {
     private int id;
     private String body;
     private int priority;
+    private boolean done;
 
-    public TodoItem(String body, int priority) {
+    public TodoItem(String body, int priority, boolean done) {
         super();
         this.body = body;
         this.priority = priority;
+        this.done = done;
     }
 
     public String getBody() {
@@ -39,5 +41,13 @@ public class TodoItem implements Serializable {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public boolean getDone() {
+        return done;
+    }
+
+    public void setDone(boolean done) {
+        this.done = done;
     }
 }

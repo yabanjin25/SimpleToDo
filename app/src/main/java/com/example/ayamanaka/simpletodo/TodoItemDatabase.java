@@ -25,6 +25,8 @@ public class TodoItemDatabase extends SQLiteOpenHelper {
     private static final String KEY_ID = "id";
     private static final String KEY_BODY = "body";
     private static final String KEY_PRIORITY = "priority";
+    private static final String KEY_DONE = "done";
+
 
     public TodoItemDatabase(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -38,7 +40,8 @@ public class TodoItemDatabase extends SQLiteOpenHelper {
         // Construct a table for todo items
         String CREATE_TODO_TABLE = "CREATE TABLE " + TABLE_TODO + "("
                 + KEY_ID + " INTEGER PRIMARY KEY," + KEY_BODY + " TEXT,"
-                + KEY_PRIORITY + " INTEGER" + ")";
+                + KEY_PRIORITY + " INTEGER,"
+                + KEY_DONE + " BOOLEAN" + ")";
         db.execSQL(CREATE_TODO_TABLE);
     }
 
@@ -63,6 +66,7 @@ public class TodoItemDatabase extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(KEY_BODY, item.getBody());
         values.put(KEY_PRIORITY, item.getPriority());
+        values.put(KEY_DONE, false);
         // Insert Row
         long rowId = db.insertOrThrow(TABLE_TODO, null, values);
         db.close(); // Closing database connection
@@ -75,13 +79,13 @@ public class TodoItemDatabase extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         // Construct and execute query
         Cursor cursor = db.query(TABLE_TODO,  // TABLE
-                new String[] { KEY_ID, KEY_BODY, KEY_PRIORITY }, // SELECT
+                new String[] { KEY_ID, KEY_BODY, KEY_PRIORITY, KEY_DONE }, // SELECT
                 KEY_ID + "= ?", new String[] { String.valueOf(id) },  // WHERE, ARGS
                 null, null, "id ASC", "100"); // GROUP BY, HAVING, ORDER BY, LIMIT
         if (cursor != null)
             cursor.moveToFirst();
         // Load result into model object
-        TodoItem item = new TodoItem(cursor.getString(1), cursor.getInt(2));
+        TodoItem item = new TodoItem(cursor.getString(1), cursor.getInt(2), Boolean.parseBoolean(cursor.getString(3)));
         item.setId(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_ID)));
         // return todo item
         return item;
@@ -98,7 +102,8 @@ public class TodoItemDatabase extends SQLiteOpenHelper {
         // looping through all rows and adding to list
         if (cursor.moveToFirst()) {
             do {
-                TodoItem item = new TodoItem(cursor.getString(1), cursor.getInt(2));
+                boolean itemDone = cursor.getInt(3) > 0;
+                TodoItem item = new TodoItem(cursor.getString(1), cursor.getInt(2), itemDone);
                 item.setId(cursor.getInt(0));
                 // Adding todo item to list
                 todoItems.add(item);
@@ -125,6 +130,7 @@ public class TodoItemDatabase extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(KEY_BODY, item.getBody());
         values.put(KEY_PRIORITY, item.getPriority());
+        values.put(KEY_DONE, item.getDone());
         // Updating row
         int result = db.update(TABLE_TODO, values, KEY_ID + " = ?",
                 new String[] { String.valueOf(item.getId()) });
