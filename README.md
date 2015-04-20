@@ -12,6 +12,11 @@ Completed user stories:
  * [x] Required: User can long-press an item to remove it from the list
  * [x] Required: User can edit an item by clicking on it, and editing it in a different form
  * [x] Required: User can restart application and list items will have persisted
+ * [x] Extra: User can check and uncheck off items
+ 
+ Extensions:
+
+ * Replaced persistence of items through a file with a SQLite database
  
 Notes:
 
@@ -19,10 +24,6 @@ Initially had some trouble with passing the data around, but that was really the
 
 Walkthrough of all user stories:
 
-![Video Walkthrough](SimpleToDoWalkthrough.gif)
+![Video Walkthrough](SimpleToDoWalkthrough2.gif)
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
-
-Extensions:
-
- * Replaced persistence of items through a file with a SQLite database
